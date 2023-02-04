@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-MYSQL_CONNECTION = "{}:{}@{}:{}/{}".format("dbroot", "dbroot", "localhost", 3600,
+MYSQL_CONNECTION = "{}:{}@{}:{}/{}".format("dbroot", "dbroot", "localhost", 3306,
                                            "green_light")
 
 

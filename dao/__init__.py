@@ -1,2 +1,2 @@
-from .analytics_dao import *
+from .model_dao import *
 

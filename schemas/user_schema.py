@@ -10,7 +10,9 @@ class UserSchema(BaseModel):
     long: str
     phone_no: int
     type: int
+    message: str
     status: Optional[int]
+    assigned_amb: int
 
     class Config:
         orm_mode = True

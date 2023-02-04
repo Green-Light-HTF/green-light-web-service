@@ -1,50 +1,20 @@
 from fastapi import FastAPI, APIRouter
-from starlette.responses import HTMLResponse
-from starlette.websockets import WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
+from starlette.websockets import WebSocket, WebSocketDisconnect
+from api.api_v1.api import router as api_router
 from src.realtime_data_broadcast import RealTimeDataBroadcast
+import uvicorn
 
 app = FastAPI()
 
-router = APIRouter()
-
+ambulance_on_wheel = []
 
 
 @app.get("/")
 async def get():
     return "{'result': OK}"
 
-@router.get('/')
-def get_notes():
-    return "return a list of note items"
-
-
-@router.post('/', status_code=201)
-def create_note():
-    return "create note item"
-
-
-@router.patch('/{noteId}')
-def update_note(noteId: str):
-    return f"update note item with id {noteId}"
-
-
-@router.get('/{noteId}')
-def get_note(noteId: str):
-    return f"get note item with id {noteId}"
-
-
-@router.delete('/{noteId}')
-def delete_note(noteId: str):
-    return f"delete note item with id {noteId}"
-
-
-app.include_router(router, tags=['Notes'], prefix='/api/notes')
-
-
-@app.get("/api/healthchecker")
-def root():
-    return {"message": "Welcome to FastAPI with SQLAlchemy"}
 
 notifier = RealTimeDataBroadcast()
 
@@ -69,3 +39,23 @@ async def push_to_connected_websockets(message: str):
 async def startup():
     # Prime the push notification generator
     await notifier.generator.asend(None)
+
+
+app.include_router(api_router, tags=['None'])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+
+@api_router.get('/')
+def get_notes():
+    return "return a list of note items"
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=10001)

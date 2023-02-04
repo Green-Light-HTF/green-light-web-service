@@ -91,14 +91,16 @@ def get_location_info(lat, long, api_key):
 
 
 def get_contact_to_notify(db, lat, long):
+    print("In get Contact")
     query = dao.get_fl_workers(db)
     radius_items = {}
     all_fl_workers = {}
     for item in query:
-        all_fl_workers[item.phone_no] = (item.lat, item.long)
-        dis = distance_between_coordinates((lat, long), (item.lat, item.long))
+        all_fl_workers[item.phone_no] = ((item.lat), item.long)
+        dis = distance_between_coordinates((float(lat), float(long)), (item.lat, item.long))
 
         radius_items[dis] = item.phone_no
+        print(dis)
 
     nearest = list(radius_items.keys())
     nearest.sort()
@@ -106,10 +108,11 @@ def get_contact_to_notify(db, lat, long):
         return []
     # time calculate
     consider_index = []
-    threshold = 400
+    threshold = 80
     for i in nearest:
         if i <= threshold:
             consider_index.append(radius_items[i])
+    print("Selected Numbers {}".format(consider_index))
     response_list = {k: v for k, v in all_fl_workers.items() if k in consider_index}
     return response_list
 
@@ -119,7 +122,7 @@ async def track_live_location(*, db: Session = Depends(deps.get_db), user_id, am
     try:
 
         message = dao.get_message_data(db, user_id)
-        api_key = "******"
+        api_key = "AjPGihUegNVzAbd_Fe78htn--29QxOLn2i5_EJp2BaJbXvSGC-GzSHceIDm28quR"
         location_info = get_location_info(lat, long, api_key)
         loc_name = location_info["resourceSets"][0]['resources'][0]["name"]
         notification = "Patient met to an accident, Ambulance is on the way to {}. Please take necessary action. Track Ambulance live at " \
@@ -133,20 +136,21 @@ async def track_live_location(*, db: Session = Depends(deps.get_db), user_id, am
         if "accident" in message:
             notification = "Patient met to an accident, Ambulance is on the way to {}. Please take necessary action".format(
                 loc_name)
-
+        print("In tracking ")
         numbers_to_notify = get_contact_to_notify(db, lat, long)
         for number in numbers_to_notify:
-            account_sid = '******'
-            auth_token = '*******'
+            print("Notify Send")
+            account_sid = '***'
+            auth_token = '***'
             client = Client(account_sid, auth_token)
 
             # Twilio Integration
-            # message = client.messages \
-            #     .create(
-            #     body=notification,
-            #     from_='+14303051265',
-            #     to=number
-            # )
+            message = client.messages \
+                .create(
+                body=notification,
+                from_='+14303051265',
+                to=number
+            )
             print(message.sid)
         response = {
             "numbers_to_notify": numbers_to_notify,

@@ -46,7 +46,8 @@ def nearest_amb(db: Session, lat, lng):
         all_ambulance = {}
         query = db.query(AmbulanceData.id, AmbulanceData.lat, AmbulanceData.long, AmbulanceData.status)
         for item in query:
-            dis = distance_between_coordinates((lat, long), (item.lat, item.long))
+            all_ambulance[item.id] = (item.lat, item.long)
+            dis = distance_between_coordinates((float(lat), float(lng)), (float(item.lat), float(item.long)))
             radius_items[dis] = item.id
 
         nearest = list(radius_items.keys())

@@ -119,7 +119,7 @@ async def track_live_location(*, db: Session = Depends(deps.get_db), user_id, am
     try:
 
         message = dao.get_message_data(db, user_id)
-        api_key = "AjPGihUegNVzAbd_Fe78htn--29QxOLn2i5_EJp2BaJbXvSGC-GzSHceIDm28quR"
+        api_key = "******"
         location_info = get_location_info(lat, long, api_key)
         loc_name = location_info["resourceSets"][0]['resources'][0]["name"]
         notification = "Patient met to an accident, Ambulance is on the way to {}. Please take necessary action. Track Ambulance live at " \
@@ -136,8 +136,8 @@ async def track_live_location(*, db: Session = Depends(deps.get_db), user_id, am
 
         numbers_to_notify = get_contact_to_notify(db, lat, long)
         for number in numbers_to_notify:
-            account_sid = 'AC5fa1f0f1ac4e7547a99a8a65bf734938'
-            auth_token = '7f9cb487591f910dcbf73ed8c1907c80'
+            account_sid = '******'
+            auth_token = '*******'
             client = Client(account_sid, auth_token)
 
             # Twilio Integration
